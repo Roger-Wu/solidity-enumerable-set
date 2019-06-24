@@ -1,0 +1,79 @@
+pragma solidity ^0.5.0;
+
+/// @title EnumerableSet
+/// @author Roger-Wu
+/// @notice This library implements an enumerable set which stores unique values
+/// and is able to return the stored values as an array.
+/// @dev In order to return the stored values as an array, we store an array of elements in the contract.
+/// However, storing such array on chain consumes more gas and is usually not the best practice.
+/// Consider emitting events whenever values are added or removed.
+/// Then reconstruct the array of elements off-chain based on the events.
+library EnumerableUintSet {
+    struct Data {
+        uint256[] _elements;
+        mapping(uint256 => bool) _isElement;
+    }
+
+    /// @notice Try to add a value into the set.
+    /// @param value The value to add into the set.
+    /// @return `false` if `value` is already in the set, `true` if `value` is successfully added into the set.
+    function add(Data storage self, uint256 value)
+        public
+        returns (bool)
+    {
+        if (self._isElement[value]) {
+            return false;
+        }
+        self._isElement[value] = true;
+        self._elements.push(value);
+        return true;
+    }
+
+    /// @notice Try to remove a value from the set.
+    /// @param value The value to remove from the set.
+    /// @return `false` if `value` is not in the set, `true` if `value` is successfully removed from the set.
+    function remove(Data storage self, uint256 value)
+        public
+        returns (bool)
+    {
+        if (!self._isElement[value]) {
+            return false;
+        }
+        self._isElement[value] = false;
+
+        for (uint i = 0; i < self._elements.length; i++) {
+            if (self._elements[i] == value) {
+                if (i != self._elements.length - 1) {
+                    // copy the last element to this slot
+                    self._elements[i] = self._elements[self._elements.length - 1];
+                }
+                self._elements.length--;
+                break;
+            }
+        }
+
+        return true;
+    }
+
+    /// @notice Check if a value is in the set.
+    /// @param value The value to check if is in the set.
+    /// @return `true` if `value` is in the set, `false` if not.
+    function contains(Data storage self, uint256 value)
+        public
+        view
+        returns (bool)
+    {
+        return self._isElement[value];
+    }
+
+    /// @notice Get elements in the set.
+    /// @dev The returned elements may not be sorted in the added order.
+    /// @return a clone of the array of elements in the set.
+    function elements(Data storage self)
+        public
+        view
+        returns (uint256[] memory)
+    {
+        return self._elements;
+    }
+}

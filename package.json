@@ -1,0 +1,13 @@
+{
+  "name": "enumerable-set",
+  "version": "1.0.0",
+  "description": "enumerable set library written in solidity",
+  "scripts": {
+    "solpp": "npx solpp contracts-solpp/EnumerableSet.solpp -o contracts/EnumerableSet.sol"
+  },
+  "author": "Roger-Wu",
+  "license": "ISC",
+  "devDependencies": {
+    "solpp": "^0.10.2"
+  }
+}
